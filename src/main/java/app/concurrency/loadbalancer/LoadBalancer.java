@@ -37,7 +37,7 @@ public class LoadBalancer {
 
         lock.lock();
         try {
-            return servers.get(roundRobinCounter % servers.size());
+            return servers.get(roundRobinCounter++ % servers.size());
         } finally {
             lock.unlock();
         }
