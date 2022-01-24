@@ -1,4 +1,4 @@
-package domain;
+package domain.concurrency.loadbalancer;
 
 import lombok.Value;
 
