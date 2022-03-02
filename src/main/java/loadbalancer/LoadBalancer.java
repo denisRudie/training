@@ -1,6 +1,5 @@
-package app.concurrency.loadbalancer;
+package loadbalancer;
 
-import domain.concurrency.loadbalancer.Server;
 import lombok.Data;
 
 import java.util.List;

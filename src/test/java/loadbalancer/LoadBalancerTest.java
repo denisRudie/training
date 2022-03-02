@@ -1,9 +1,9 @@
-import app.concurrency.loadbalancer.LoadBalancer;
-import domain.concurrency.loadbalancer.Server;
+package loadbalancer;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static app.concurrency.loadbalancer.LoadBalancer.CAPACITY;
+import static loadbalancer.LoadBalancer.CAPACITY;
 
 public class LoadBalancerTest {
 
