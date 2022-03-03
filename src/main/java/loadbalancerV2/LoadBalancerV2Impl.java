@@ -8,7 +8,6 @@ import loadbalancerV2.exception.ServersCapacityReachedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -65,11 +64,6 @@ public class LoadBalancerV2Impl implements LoadBalancerV2 {
         } finally {
             readWriteLock.readLock().unlock();
         }
-    }
-
-    @Override
-    public ServerInfo getRandom(Random random) {
-        return servers.get(random.nextInt(servers.size()));
     }
 
     private boolean validateServer(ServerInfo server) {

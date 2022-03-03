@@ -8,17 +8,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoadBalancerV2Test {
 
@@ -72,22 +70,24 @@ public class LoadBalancerV2Test {
     }
 
     @Test
-    void whenGetServer_thenAlwaysReturnMockedRandom_randomCase() {
-        loadBalancerV2 = new LoadBalancerV2Impl(1000);
+    void whenGetServer_thenAlwaysReturnMockedRandom_concurrentRandomCase() {
+        loadBalancerV2 = new LoadBalancerV2Impl(10);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        List<ServerInfo> serversForAdding = new ArrayList<>();
 
         for (int i = 0; i < 1000; i++) {
-            loadBalancerV2.add(new ServerInfo(IP, PORT + i));
+            serversForAdding.add(new ServerInfo(IP, PORT + i));
         }
 
-        Random randomMock = mock(Random.class);
-        when(randomMock.nextInt(anyInt())).thenReturn(0);
+        serversForAdding.forEach(serverInfo -> executorService.execute(() -> loadBalancerV2.add(serverInfo)));
 
-        Set<ServerInfo> randomServers = new HashSet<>();
-        for (int i = 0; i < 100; i++) {
-            randomServers.add(loadBalancerV2.getRandom(randomMock));
-        }
+        Map<ServerInfo, Long> foundedServers = IntStream.range(0, 100)
+                .mapToObj(i ->  loadBalancerV2.get(ServerSelectorStrategy.RANDOM))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-        assertEquals(1, randomServers.size());
+        assertTrue(foundedServers.size() > 1);
     }
 
     @Test
